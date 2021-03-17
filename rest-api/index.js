@@ -4,19 +4,44 @@
 
 // Dependencies
 const http = require('http')
+const https = require('https')
 const url = require('url')
 const StringDecoder = require('string_decoder').StringDecoder
 const config = require('./config')
+const { readFileSync, readFile } = require('fs')
 
-// the server should response to all request with a string
-const server = http.createServer((req, res) => {
+// instantiate the http server
+const httpServer = http.createServer((req, res) => {
+  unifiedServer(req, res)
+})
 
+
+// start the http server and listen
+httpServer.listen(config.httpPort, () => console.log(`http server is listening on port ${config.httpPort}`))
+
+// instantiate the https server
+const httpsServerOptions = {
+  'key': readFile('./https/key.pem', (err, data) => data),
+  'cert': readFile('./https/cert.pem', (err, data) => data)
+}
+const httpsServer = https.createServer(httpsServerOptions, (req, res) => {
+  unifiedServer(req, res)
+})
+
+// start the https server and listen
+httpsServer.listen(config.httpsPort, () => console.log(`https server is listening on port ${config.httpsPort}`))
+
+// server logic
+const unifiedServer = (req, res) => {
   // get the url and parse it
   const parsedUrl = url.parse(req.url, true)
 
   // get the url path
   const pathName = parsedUrl.pathname
   const trimmedPath = pathName.replace(/^\/+|\/+$/g, '')
+
+  // log the requested path
+  console.log('request received on path : ' + trimmedPath)
 
   // get the query string
   const queryStringObject = parsedUrl.query
@@ -71,20 +96,17 @@ const server = http.createServer((req, res) => {
       res.end(payloadString)
     })
   
-    // log the requested path
-    console.log('request received on path : ' + trimmedPath)
   })
-
-})
-
-// start the server and listen on port 3000
-server.listen(3000, () => console.log(`server is listening on port ${config.port} in ${config.envName.toUpperCase()} mode`))
+}
 
 // define routers
 const routers = {
-  'hello-world': ({ payload }, callback) => {
+  'hello': ({ payload }, callback) => {
     payload = JSON.parse(payload)
     callback(200, { greet: `hello ${payload.name}`})
+  },
+  'ping': (data, callback) => {
+    callback(200)
   },
   'not-found': (data, callback) => callback(404, { message: 'page not found :(' })
 }

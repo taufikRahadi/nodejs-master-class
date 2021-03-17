@@ -6,13 +6,15 @@ const env = {}
 
 // development environment
 env.development = {
-  port: 3000,
+  httpPort: 5000,
+  httpsPort: 5001,
   envName: 'development'
 }
 
 // production environment
 env.production = {
-  port: 8080,
+  httpPort: 8081,
+  httpsPort: 8080,
   envName: 'production'
 }
 
