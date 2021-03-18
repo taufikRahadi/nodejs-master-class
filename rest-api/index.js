@@ -9,12 +9,12 @@ const url = require('url')
 const StringDecoder = require('string_decoder').StringDecoder
 const config = require('./config')
 const { readFileSync, readFile } = require('fs')
+const _data = require('./lib/data')
 
 // instantiate the http server
 const httpServer = http.createServer((req, res) => {
   unifiedServer(req, res)
 })
-
 
 // start the http server and listen
 httpServer.listen(config.httpPort, () => console.log(`http server is listening on port ${config.httpPort}`))
