@@ -10,6 +10,7 @@ const StringDecoder = require('string_decoder').StringDecoder
 const config = require('./config')
 const { readFileSync, readFile } = require('fs')
 const _data = require('./lib/data')
+const handlers = require('./lib/handlers')
 
 // instantiate the http server
 const httpServer = http.createServer((req, res) => {
@@ -30,6 +31,16 @@ const httpsServer = https.createServer(httpsServerOptions, (req, res) => {
 
 // start the https server and listen
 httpsServer.listen(config.httpsPort, () => console.log(`https server is listening on port ${config.httpsPort}`))
+
+// initiate empty object as routers
+let routers = {
+  'not-found': (_, callback) => callback(404, { message: 'page not found :(' })
+}
+
+// loop handlers and assign handlers key as routers object key
+for (let k in handlers) {
+  routers[k] = handlers[k]
+}
 
 // server logic
 const unifiedServer = (req, res) => {
@@ -97,16 +108,4 @@ const unifiedServer = (req, res) => {
     })
   
   })
-}
-
-// define routers
-const routers = {
-  'hello': ({ payload }, callback) => {
-    payload = JSON.parse(payload)
-    callback(200, { greet: `hello ${payload.name}`})
-  },
-  'ping': (data, callback) => {
-    callback(200)
-  },
-  'not-found': (data, callback) => callback(404, { message: 'page not found :(' })
 }
