@@ -8,14 +8,16 @@ const env = {}
 env.development = {
   httpPort: 5000,
   httpsPort: 5001,
-  envName: 'development'
+  envName: 'development',
+  hashSecret: 'WebProgrammingUT'
 }
 
 // production environment
 env.production = {
   httpPort: 8081,
   httpsPort: 8080,
-  envName: 'production'
+  envName: 'production',
+  hashSecret: 'WebProgrammingUT'
 }
 
 // determine which environment was passed as a command-line argument
